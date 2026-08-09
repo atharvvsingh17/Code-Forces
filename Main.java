@@ -1,70 +1,44 @@
-import java.io.InputStream;
-import java.io.IOException;
+import java.util.*;
+import java.io.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        FastScanner scanner = new FastScanner(System.in);
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in), 1 << 16);
+        int t = Integer.parseInt(br.readLine().trim());
         StringBuilder sb = new StringBuilder();
 
-        int t = scanner.nextInt();
         while (t-- > 0) {
-            int n = scanner.nextInt();
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int n = Integer.parseInt(st.nextToken());
+            int q = Integer.parseInt(st.nextToken());
 
-            long sum = 0;
-            boolean possible = true;
+            String s = br.readLine().trim();
+            String tt = br.readLine().trim();
+
+            int[] prefB = new int[n + 1];
+            int[] prefC = new int[n + 1];
 
             for (int i = 1; i <= n; i++) {
-                long val = scanner.nextInt();
-                sum += val;
-
-                long minRequired = (long) i * (i + 1) / 2;
-
-                if (sum < minRequired) {
-                    possible = false;
-                }
+                char cs = s.charAt(i - 1);
+                char ct = tt.charAt(i - 1);
+                prefB[i] = prefB[i - 1] + ((cs == '0' && ct == '1') ? 1 : 0);
+                prefC[i] = prefC[i - 1] + ((cs == '1' && ct == '0') ? 1 : 0);
             }
 
-            if (possible) {
-                sb.append("YES\n");
-            } else {
-                sb.append("NO\n");
+            for (int i = 0; i < q; i++) {
+                st = new StringTokenizer(br.readLine());
+                int l = Integer.parseInt(st.nextToken());
+                int r = Integer.parseInt(st.nextToken());
+
+                int cb = prefB[r] - prefB[l - 1];
+                int cc = prefC[r] - prefC[l - 1];
+                int len = r - l + 1;
+                int mx = Math.max(cb, cc);
+
+                sb.append((2 * mx <= len) ? "YES" : "NO").append('\n');
             }
         }
 
         System.out.print(sb);
-    }
-
-    static class FastScanner {
-        private final InputStream in;
-        private final byte[] buffer = new byte[32768];
-        private int head = 0;
-        private int tail = 0;
-
-        public FastScanner(InputStream in) {
-            this.in = in;
-        }
-
-        private int read() throws IOException {
-            if (head >= tail) {
-                head = 0;
-                tail = in.read(buffer, 0, buffer.length);
-                if (tail <= 0) return -1;
-            }
-            return buffer[head++];
-        }
-
-        public int nextInt() throws IOException {
-            int c = read();
-            while (c <= ' ') {
-                if (c == -1) return -1;
-                c = read();
-            }
-            int res = 0;
-            while (c >= '0' && c <= '9') {
-                res = res * 10 + c - '0';
-                c = read();
-            }
-            return res;
-        }
     }
 }
